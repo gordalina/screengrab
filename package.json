@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@google-cloud/storage": "^4.2.0",
+    "clipboardy": "^2.1.0",
+    "dotenv": "^8.2.0"
+  }
+}
