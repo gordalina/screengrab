@@ -3,6 +3,7 @@ require('dotenv').config();
 const fs = require('fs');
 const util = require('util');
 const {Storage} = require('@google-cloud/storage');
+const { BitlyClient } = require('bitly');
 const clipboardy = require('clipboardy');
 
 const BUCKET = process.env.BUCKET || 'bucket';
@@ -12,6 +13,7 @@ const FILE_PATTERN = /^Screen .+\.png$/;
 const watch = util.promisify(fs.watch);
 const storage = new Storage();
 const bucket = storage.bucket(BUCKET);
+const bitly = new BitlyClient(process.env.BITLY_TOKEN);
 
 async function upload(pathname) {
   return bucket.upload(pathname, {
@@ -38,7 +40,8 @@ async function handle(event, filename) {
     console.time(`Upload '${pathname}'`)
 
     await upload(pathname);
-    const url = await getSignedUrl(filename);
+    const signedUrl = await getSignedUrl(filename);
+    const { url } = await bitly.shorten(signedUrl);
 
     await clipboardy.write(url);
     const end = Date.now();
